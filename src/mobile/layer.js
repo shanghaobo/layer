@@ -13,6 +13,8 @@
 var doc = document, query = 'querySelectorAll', claname = 'getElementsByClassName', S = function(s){
   return doc[query](s);
 };
+var shadowRoot = null;
+var layerContainer = document.body;
 
 //默认配置
 var config = {
@@ -48,7 +50,7 @@ var index = 0, classs = ['layui-m-layer'], Layer = function(options){
 };
 
 Layer.prototype.view = function(){
-  var that = this, config = that.config, layerbox = doc.createElement('div');
+  var that = this, config = that.config, layerbox = document.createElement('div');
 
   that.id = layerbox.id = classs[0] + index;
   layerbox.setAttribute('class', classs[0] + ' ' + classs[0]+(config.type || 0));
@@ -79,7 +81,7 @@ Layer.prototype.view = function(){
   if(!config.fixed){
     config.top = config.hasOwnProperty('top') ?  config.top : 100;
     config.style = config.style || '';
-    config.style += ' top:'+ ( doc.body.scrollTop + config.top) + 'px';
+    config.style += ' top:'+ ( layerContainer.scrollTop + config.top) + 'px';
   }
   
   if(config.type === 2){
@@ -107,7 +109,7 @@ Layer.prototype.view = function(){
     }
   }
   
-  document.body.appendChild(layerbox);
+  layerContainer.appendChild(layerbox);
   var elem = that.elem = S('#'+that.id)[0];
   config.success && config.success(elem);
   
@@ -157,6 +159,12 @@ win.layer = {
   v: '2.0',
   index: index,
   
+  setShadowRoot: function(val){
+    shadowRoot = val;
+    doc = shadowRoot;
+    layerContainer = shadowRoot;
+  },
+
   //核心方法
   open: function(options){
     var o = new Layer(options || {});
@@ -167,7 +175,7 @@ win.layer = {
     var ibox = S('#'+classs[0]+index)[0];
     if(!ibox) return;
     ibox.innerHTML = '';
-    doc.body.removeChild(ibox);
+    layerContainer.removeChild(ibox);
     clearTimeout(ready.timer[index]);
     delete ready.timer[index];
     typeof ready.end[index] === 'function' && ready.end[index]();
@@ -182,26 +190,5 @@ win.layer = {
     }
   }
 };
-
-'function' == typeof define ? define(function() {
-  return layer;
-}) : function(){
-  
-  var js = document.scripts, script = js[js.length - 1], jsPath = script.src;
-  var path = jsPath.substring(0, jsPath.lastIndexOf("/") + 1);
-  
-  //如果合并方式，则需要单独引入layer.css
-  if(script.getAttribute('merge')) return; 
-  
-  document.head.appendChild(function(){
-    var link = doc.createElement('link');
-    link.href = path + 'need/layer.css?2.0';
-    link.type = 'text/css';
-    link.rel = 'styleSheet'
-    link.id = 'layermcss';
-    return link;
-  }());
-  
-}();
 
 }(window);
