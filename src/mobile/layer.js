@@ -184,7 +184,7 @@ win.layer = {
   
   //关闭所有layer层
   closeAll: function(){
-    var boxs = doc[claname](classs[0]);
+    var boxs = doc[query]("." + classs[0]);
     for(var i = 0, len = boxs.length; i < len; i++){
       layer.close((boxs[0].getAttribute('index')|0));
     }
